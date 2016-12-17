@@ -1,11 +1,10 @@
 // ==UserScript==
-// @name         Trello - Show Card Count
-// @name:zh-CN   Trello - 显示卡片数量
+// @name         Trello - Thenow Trello Extend
 // @namespace    http://ejiasoft.com/
-// @homepageurl  https://greasyfork.org/scripts/25627-trello-show-card-count
-// @version      1.2.4
-// @description  Show card count at the end of board title
-// @description:zh-CN 在列表头部显示卡片数量
+// @version      1.0
+// @description  Extend trello.com
+// @description:zh-CN 扩展trello.com看板的功能
+// @homepageurl  https://github.com/thenow/ThenowTrelloExtend
 // @author       thenow
 // @match        http*://*trello.com
 // @match        http*://*trello.com/*
