@@ -61,7 +61,7 @@ init = ->
         loadFinish = $('p.list-header-num-cards').length > 0
         if loadFinish
             $('p.list-header-num-cards').show() # 显示卡片数量
-            $('span.card-short-id').show() # 显示卡片编号
+            $('span.card-short-id').append('<span>&nbsp;</span>').show() # 显示卡片编号
             listFormatInit()
             imgSwitch_click()
     ),1000
