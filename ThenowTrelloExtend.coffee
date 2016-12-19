@@ -26,8 +26,8 @@ pageRegex = # 需要用到的正则表达式
 
 listCardFormat = (objCard) -> # 卡片格式化
     cardTitle   = objCard.find('a.list-card-title').text()
-    cardNum     = pageRegex.cardNum.exec(cardTitle)[0]
-    spanCardNum = $ "<span class=\"card-short-id\">#{cardnum}</span>"
+    cardNum     = pageRegex.CardNum.exec(cardTitle)[0]
+    spanCardNum = $ "<span class=\"card-short-id\">#{cardNum}</span>"
 
 listTitleFormat = (objList) -> # 列表标题格式化
     curListHeader = objList.find 'div.list-header' # 当前列表对象
