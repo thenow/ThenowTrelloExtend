@@ -9,6 +9,8 @@
 // @description:zh-CN 扩展trello.com看板的功能
 // @homepageurl  https://github.com/thenow/ThenowTrelloExtend
 // @author       thenow
+// @run-at       document-end
+// @license      MIT license
 // @match        http*://*trello.com
 // @match        http*://*trello.com/*
 // @grant        none
