@@ -15,8 +15,6 @@
 // ==/UserScript==
 ###
 
-curUrl = window.location.href # 当前页面地址
-
 pageRegex = # 需要用到的正则表达式
     CardLimit:/\[\d+\]/   # 卡片数量限制
     Category : /{.+}/g     # 分类
@@ -70,7 +68,9 @@ showCardNum = -> # 显示卡片编号
         curCardNum = $.trim $(this).text()
         $(this).text(curCardNum+' ').show()
 
-init = ->
+curUrl = window.location.href # 当前页面地址
+boardInit = ->
+    return if pageRegex.HomePage.exec(curUrl) != null
     $('p.list-header-num-cards').show() # 显示卡片数量
     showCardNum()
     listFormatInit()
@@ -78,5 +78,6 @@ init = ->
 
 $ ->
     setInterval (->
-        init()
+        curUrl = window.location.href # 当前页面地址
+        boardInit()
     ),1000

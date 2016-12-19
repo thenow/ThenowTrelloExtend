@@ -18,9 +18,7 @@
  */
 
 (function() {
-  var curUrl, imgSwitch_click, init, listCardFormat, listFormatInit, listTitleFormat, pageRegex, showCardNum;
-
-  curUrl = window.location.href;
+  var boardInit, curUrl, imgSwitch_click, listCardFormat, listFormatInit, listTitleFormat, pageRegex, showCardNum;
 
   pageRegex = {
     CardLimit: /\[\d+\]/,
@@ -98,7 +96,12 @@
     });
   };
 
-  init = function() {
+  curUrl = window.location.href;
+
+  boardInit = function() {
+    if (pageRegex.HomePage.exec(curUrl) !== null) {
+      return;
+    }
     $('p.list-header-num-cards').show();
     showCardNum();
     listFormatInit();
@@ -107,7 +110,8 @@
 
   $(function() {
     return setInterval((function() {
-      return init();
+      curUrl = window.location.href;
+      return boardInit();
     }), 1000);
   });
 
