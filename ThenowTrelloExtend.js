@@ -4,7 +4,7 @@
 // ==UserScript==
 // @name         Trello - Thenow Trello Extend
 // @namespace    http://ejiasoft.com/
-// @version      1.0
+// @version      1.1
 // @description  Extend trello.com
 // @description:zh-CN 扩展trello.com看板的功能
 // @homepageurl  https://github.com/thenow/ThenowTrelloExtend
@@ -18,14 +18,14 @@
  */
 
 (function() {
-  var curUrl, imgSwitch_click, init, listCardFormat, listFormatInit, listTitleFormat, pageRegex;
+  var curUrl, imgSwitch_click, init, listCardFormat, listFormatInit, listTitleFormat, pageRegex, showCardNum;
 
   curUrl = window.location.href;
 
   pageRegex = {
     CardLimit: /\[\d+\]/,
-    Category: /{.+}/,
-    User: /`.+`/,
+    Category: /{.+}/g,
+    User: /`\S+`/g,
     CardCount: /^\d+/,
     Number: /\d+/,
     CardNum: /^#\d+/,
@@ -33,10 +33,20 @@
   };
 
   listCardFormat = function(objCard) {
-    var cardNum, cardTitle, spanCardNum;
-    cardTitle = objCard.find('a.list-card-title').text();
-    cardNum = pageRegex.CardNum.exec(cardTitle)[0];
-    return spanCardNum = $("<span class=\"card-short-id\">" + cardNum + "</span>");
+    var cardTitle, cardUser, cardUserArray, i, len, listCardTitle, trueUser;
+    listCardTitle = objCard.find('a.list-card-title');
+    cardTitle = listCardTitle.html();
+    cardUserArray = cardTitle.match(pageRegex.User);
+    if (cardUserArray === null) {
+      return;
+    }
+    for (i = 0, len = cardUserArray.length; i < len; i++) {
+      cardUser = cardUserArray[i];
+      cardTitle = cardTitle.replace(cardUser, '');
+      trueUser = cardUser.replace(/`/g, '');
+      cardTitle += "<code>" + trueUser + "</code>";
+    }
+    return listCardTitle.html(cardTitle);
   };
 
   listTitleFormat = function(objList) {
@@ -54,6 +64,8 @@
       return objList.css('background', '#903');
     } else if (cardCount === cardLimit) {
       return objList.css('background', '#c93');
+    } else {
+      return objList.css('background', '#e2e4e6');
     }
   };
 
@@ -68,38 +80,35 @@
 
   imgSwitch_click = function() {
     var imgSwitch;
-    imgSwitch = $('<a class="board-header-btn board-header-btn-org-name board-header-btn-without-icon"><span class="board-header-btn-text">隐藏/显示图片</span></a>');
+    if ($('#btnImgSwitch').length > 0) {
+      return;
+    }
+    imgSwitch = $('<a id="btnImgSwitch" class="board-header-btn board-header-btn-org-name board-header-btn-without-icon"><span class="board-header-btn-text">隐藏/显示图片</span></a>');
     $('div.board-header').append(imgSwitch);
     return imgSwitch.click(function() {
       return $('div.list-card-cover').slideToggle();
     });
   };
 
+  showCardNum = function() {
+    return $('span.card-short-id').each(function() {
+      var curCardNum;
+      curCardNum = $.trim($(this).text());
+      return $(this).text(curCardNum + ' ').show();
+    });
+  };
+
   init = function() {
-    var initTimer, loadFinish;
-    loadFinish = false;
-    return initTimer = setTimeout((function() {
-      if (loadFinish) {
-        clearTimeout(initTimer);
-      }
-      loadFinish = $('p.list-header-num-cards').length > 0;
-      if (loadFinish) {
-        $('p.list-header-num-cards').show();
-        $('span.card-short-id').append('<span>&nbsp;</span>').show();
-        listFormatInit();
-        return imgSwitch_click();
-      }
-    }), 1000);
+    $('p.list-header-num-cards').show();
+    showCardNum();
+    listFormatInit();
+    return imgSwitch_click();
   };
 
   $(function() {
-    init();
-    $('#boards-drawer').on('click', '.js-open-board', function() {
+    return setInterval((function() {
       return init();
-    });
-    return $('#content').on('click', '.js-react-root a.board-title', function() {
-      return init();
-    });
+    }), 1000);
   });
 
 }).call(this);
