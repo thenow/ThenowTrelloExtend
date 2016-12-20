@@ -2,18 +2,18 @@
 
 /*
 // ==UserScript==
-// @name         Trello - Thenow Trello Extend
-// @namespace    http://ejiasoft.com/
-// @version      1.1
-// @description  Extend trello.com
+// @name              Trello - Thenow Trello Extend
+// @namespace         http://ejiasoft.com/
+// @version           1.1.1
+// @description       Extend trello.com
 // @description:zh-CN 扩展trello.com看板的功能
-// @homepageurl  https://github.com/thenow/ThenowTrelloExtend
-// @author       thenow
-// @run-at       document-end
-// @license      MIT license
-// @match        http*://*trello.com
-// @match        http*://*trello.com/*
-// @grant        none
+// @homepageurl       https://github.com/thenow/ThenowTrelloExtend
+// @author            thenow
+// @run-at            document-end
+// @license           MIT license
+// @match             http*://*trello.com
+// @match             http*://*trello.com/*
+// @grant             none
 // ==/UserScript==
  */
 
@@ -22,7 +22,7 @@
 
   pageRegex = {
     CardLimit: /\[\d+\]/,
-    Category: /{.+}/g,
+    Category: /\{.+\}/g,
     User: /`\S+`/g,
     CardCount: /^\d+/,
     Number: /\d+/,
@@ -31,18 +31,26 @@
   };
 
   listCardFormat = function(objCard) {
-    var cardTitle, cardUser, cardUserArray, i, len, listCardTitle, trueUser;
+    var cardCate, cardCategoryArray, cardTitle, cardUser, cardUserArray, i, j, len, len1, listCardTitle, trueUser;
     listCardTitle = objCard.find('a.list-card-title');
     cardTitle = listCardTitle.html();
     cardUserArray = cardTitle.match(pageRegex.User);
-    if (cardUserArray === null) {
-      return;
+    cardCategoryArray = cardTitle.match(pageRegex.Category);
+    if (cardUserArray !== null) {
+      for (i = 0, len = cardUserArray.length; i < len; i++) {
+        cardUser = cardUserArray[i];
+        cardTitle = cardTitle.replace(cardUser, '');
+        trueUser = cardUser.replace(/`/g, '');
+        cardTitle += "<code>" + trueUser + "</code>";
+      }
     }
-    for (i = 0, len = cardUserArray.length; i < len; i++) {
-      cardUser = cardUserArray[i];
-      cardTitle = cardTitle.replace(cardUser, '');
-      trueUser = cardUser.replace(/`/g, '');
-      cardTitle += "<code>" + trueUser + "</code>";
+    if (cardCategoryArray !== null) {
+      for (j = 0, len1 = cardCategoryArray.length; j < len1; j++) {
+        cardCate = cardCategoryArray[j];
+        cardTitle = cardTitle.replace(cardCate, '');
+        cardCate = cardCate.replace('{', '<code style="color:#0f9598">').replace('}', '</code>');
+        cardTitle = cardCate + cardTitle;
+      }
     }
     return listCardTitle.html(cardTitle);
   };

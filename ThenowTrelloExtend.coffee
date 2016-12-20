@@ -1,23 +1,23 @@
 ###
 // ==UserScript==
-// @name         Trello - Thenow Trello Extend
-// @namespace    http://ejiasoft.com/
-// @version      1.1
-// @description  Extend trello.com
+// @name              Trello - Thenow Trello Extend
+// @namespace         http://ejiasoft.com/
+// @version           1.1.1
+// @description       Extend trello.com
 // @description:zh-CN 扩展trello.com看板的功能
-// @homepageurl  https://github.com/thenow/ThenowTrelloExtend
-// @author       thenow
-// @run-at       document-end
-// @license      MIT license
-// @match        http*://*trello.com
-// @match        http*://*trello.com/*
-// @grant        none
+// @homepageurl       https://github.com/thenow/ThenowTrelloExtend
+// @author            thenow
+// @run-at            document-end
+// @license           MIT license
+// @match             http*://*trello.com
+// @match             http*://*trello.com/*
+// @grant             none
 // ==/UserScript==
 ###
 
 pageRegex = # 需要用到的正则表达式
     CardLimit:/\[\d+\]/   # 卡片数量限制
-    Category : /{.+}/g     # 分类
+    Category : /\{.+\}/g     # 分类
     User     : /`\S+`/g     # 使用者
     CardCount: /^\d+/     # 当前卡片数量
     Number   : /\d+/      # 通用取数字
@@ -27,12 +27,18 @@ pageRegex = # 需要用到的正则表达式
 listCardFormat = (objCard) -> # 卡片格式化
     listCardTitle = objCard.find('a.list-card-title')
     cardTitle = listCardTitle.html() # 获取卡片标题
-    cardUserArray = cardTitle.match pageRegex.User
-    return if cardUserArray == null
-    for cardUser in cardUserArray
-        cardTitle = cardTitle.replace cardUser,''
-        trueUser = cardUser.replace /`/g,''
-        cardTitle += "<code>#{trueUser}</code>"
+    cardUserArray = cardTitle.match pageRegex.User # 匹配相关人员标记
+    cardCategoryArray = cardTitle.match pageRegex.Category # 匹配分类标记
+    if cardUserArray != null
+        for cardUser in cardUserArray
+            cardTitle = cardTitle.replace cardUser,''
+            trueUser = cardUser.replace /`/g,''
+            cardTitle += "<code>#{trueUser}</code>"
+    if cardCategoryArray != null
+        for cardCate in cardCategoryArray 
+            cardTitle = cardTitle.replace cardCate,''
+            cardCate = cardCate.replace('{','<code style="color:#0f9598">').replace('}','</code>')
+            cardTitle = cardCate + cardTitle
     listCardTitle.html cardTitle
 
 listTitleFormat = (objList) -> # 在制品限制功能
