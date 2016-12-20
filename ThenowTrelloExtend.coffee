@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name              Trello - Thenow Trello Extend
 // @namespace         http://ejiasoft.com/
-// @version           1.1.1
+// @version           1.1.2
 // @description       Extend trello.com
 // @description:zh-CN 扩展trello.com看板的功能
 // @homepageurl       https://github.com/thenow/ThenowTrelloExtend
@@ -23,6 +23,21 @@ pageRegex = # 需要用到的正则表达式
     Number   : /\d+/      # 通用取数字
     CardNum  : /^#\d+/    # 卡片编号
     HomePage : /com[\/]$/ # 首页
+
+cardLabelCss = """
+<style type="text/css">
+    .list-card-labels .card-label {
+        font-weight: normal;
+        font-size: 10px;
+        height: 12px !important;
+        line-height: 10px !important;
+        padding: 0 3px;
+        margin: 0 3px 0 0;
+        text-shadow: none;
+        width: auto;
+        max-width: 50px;
+    }
+</style>"""
 
 listCardFormat = (objCard) -> # 卡片格式化
     listCardTitle = objCard.find('a.list-card-title')
@@ -83,6 +98,7 @@ boardInit = ->
     imgSwitch_click()
 
 $ ->
+    $('head').append cardLabelCss
     setInterval (->
         curUrl = window.location.href # 当前页面地址
         boardInit()

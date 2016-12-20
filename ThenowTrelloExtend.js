@@ -4,7 +4,7 @@
 // ==UserScript==
 // @name              Trello - Thenow Trello Extend
 // @namespace         http://ejiasoft.com/
-// @version           1.1.1
+// @version           1.1.2
 // @description       Extend trello.com
 // @description:zh-CN 扩展trello.com看板的功能
 // @homepageurl       https://github.com/thenow/ThenowTrelloExtend
@@ -18,7 +18,7 @@
  */
 
 (function() {
-  var boardInit, curUrl, imgSwitch_click, listCardFormat, listFormatInit, listTitleFormat, pageRegex, showCardNum;
+  var boardInit, cardLabelCss, curUrl, imgSwitch_click, listCardFormat, listFormatInit, listTitleFormat, pageRegex, showCardNum;
 
   pageRegex = {
     CardLimit: /\[\d+\]/,
@@ -29,6 +29,8 @@
     CardNum: /^#\d+/,
     HomePage: /com[\/]$/
   };
+
+  cardLabelCss = "<style type=\"text/css\">\n    .list-card-labels .card-label {\n        font-weight: normal;\n        font-size: 10px;\n        height: 12px !important;\n        line-height: 10px !important;\n        padding: 0 3px;\n        margin: 0 3px 0 0;\n        text-shadow: none;\n        width: auto;\n        max-width: 50px;\n    }\n</style>";
 
   listCardFormat = function(objCard) {
     var cardCate, cardCategoryArray, cardTitle, cardUser, cardUserArray, i, j, len, len1, listCardTitle, trueUser;
@@ -117,6 +119,7 @@
   };
 
   $(function() {
+    $('head').append(cardLabelCss);
     return setInterval((function() {
       curUrl = window.location.href;
       return boardInit();
