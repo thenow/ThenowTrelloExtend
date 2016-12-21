@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name              Trello - Thenow Trello Extend
 // @namespace         http://ejiasoft.com/
-// @version           1.1.2
+// @version           1.1.3
 // @description       Extend trello.com
 // @description:zh-CN 扩展trello.com看板的功能
 // @homepageurl       https://github.com/thenow/ThenowTrelloExtend
@@ -37,23 +37,32 @@ cardLabelCss = """
         width: auto;
         max-width: 50px;
     }
+    .card-short-id {
+        display: inline;
+        font-weight: bold;
+    }
+    .card-short-id:after {
+        content:" ";
+    }
 </style>"""
 
 listCardFormat = (objCard) -> # 卡片格式化
-    listCardTitle = objCard.find('a.list-card-title')
+    listCardTitle = objCard.find('a.list-card-title').filter ':last'
     cardTitle = listCardTitle.html() # 获取卡片标题
     cardUserArray = cardTitle.match pageRegex.User # 匹配相关人员标记
     cardCategoryArray = cardTitle.match pageRegex.Category # 匹配分类标记
     if cardUserArray != null
+        userStringArray = []
         for cardUser in cardUserArray
             cardTitle = cardTitle.replace cardUser,''
-            trueUser = cardUser.replace /`/g,''
-            cardTitle += "<code>#{trueUser}</code>"
+            userStringArray.push "<code>#{cardUser.substring 1,cardUser.length-1}</code>"
+        cardTitle += userStringArray.join ''
     if cardCategoryArray != null
+        categoryStringArray = []
         for cardCate in cardCategoryArray 
             cardTitle = cardTitle.replace cardCate,''
-            cardCate = cardCate.replace('{','<code style="color:#0f9598">').replace('}','</code>')
-            cardTitle = cardCate + cardTitle
+            categoryStringArray.push "<code style=\"color:#0f9598\">#{cardCate.substring 1,cardCate.length-1}</code>"
+        cardTitle += categoryStringArray.join('')
     listCardTitle.html cardTitle
 
 listTitleFormat = (objList) -> # 在制品限制功能
@@ -84,16 +93,10 @@ imgSwitch_click = -> # 添加图片显示开关
     imgSwitch.click ->
         $('div.list-card-cover').slideToggle()
 
-showCardNum = -> # 显示卡片编号
-    $('span.card-short-id').each ->
-        curCardNum = $.trim $(this).text()
-        $(this).text(curCardNum+' ').show()
-
 curUrl = window.location.href # 当前页面地址
 boardInit = ->
     return if pageRegex.HomePage.exec(curUrl) != null
     $('p.list-header-num-cards').show() # 显示卡片数量
-    showCardNum()
     listFormatInit()
     imgSwitch_click()
 
