@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name              Trello - Thenow Trello Extend
 // @namespace         http://ejiasoft.com/
-// @version           1.1.3
+// @version           1.1.4
 // @description       Extend trello.com
 // @description:zh-CN 扩展trello.com看板的功能
 // @homepageurl       https://github.com/thenow/ThenowTrelloExtend
@@ -17,12 +17,16 @@
 
 pageRegex = # 需要用到的正则表达式
     CardLimit:/\[\d+\]/   # 卡片数量限制
-    Category : /\{.+\}/g     # 分类
-    User     : /`\S+`/g     # 使用者
+    Category : /\{.+\}/g  # 分类
+    User     : /`\S+`/g   # 使用者
     CardCount: /^\d+/     # 当前卡片数量
     Number   : /\d+/      # 通用取数字
     CardNum  : /^#\d+/    # 卡片编号
     HomePage : /com[\/]$/ # 首页
+    BoardId  : /\/b\/.{8}\/-$/ # 看板页面
+
+curUrl = window.location.href # 当前页面地址
+boardId = pageRegex.BoardId.exec curUrl # 当前看板ID
 
 cardLabelCss = """
 <style type="text/css">
@@ -86,23 +90,41 @@ listFormatInit = ->
         $(this).find('div.list-card').each ->
             listCardFormat $(this)
 
-imgSwitch_click = -> # 添加图片显示开关
+addImgSwitchBtn = -> # 添加图片显示开关
     return if $('#btnImgSwitch').length > 0
     imgSwitch = $ '<a id="btnImgSwitch" class="board-header-btn board-header-btn-org-name board-header-btn-without-icon"><span class="board-header-btn-text">隐藏/显示图片</span></a>' # 按钮对象
     $('div.board-header').append imgSwitch # 添加按钮
     imgSwitch.click ->
         $('div.list-card-cover').slideToggle()
 
-curUrl = window.location.href # 当前页面地址
+addBgBtn = -> # 添加修改背景按钮
+    return if $('#setBgBtn').length > 0
+    setBgBtn = $ '<a id="setBgBtn" class="board-header-btn board-header-btn-org-name board-header-btn-without-icon"><span class="board-header-btn-text">设置背景图片</span></a>' # 按钮对象
+    $('div.board-header').append setBgBtn # 添加按钮
+    setBgBtn.click ->
+        oldBgUrl = localStorage[boardId[0]]
+        newBgUrl = prompt '请输入背景图片地址',oldBgUrl
+        return if newBgUrl == oldBgUrl
+        if newBgUrl == null or newBgUrl == ''
+            localStorage.removeItem boardId[0]
+            return
+        localStorage[boardId[0]] = newBgUrl
+
 boardInit = ->
-    return if pageRegex.HomePage.exec(curUrl) != null
+    return if pageRegex.HomePage.exec(curUrl) != null # 首页不执行
+    bgUrl = $('body').css 'background-image'
+    localBgUrl = localStorage[boardId[0]]
+    if localBgUrl != undefined and bgUrl != localBgUrl
+        $('body').css 'background-image',"url(\"#{localBgUrl}\")" 
     $('p.list-header-num-cards').show() # 显示卡片数量
     listFormatInit()
-    imgSwitch_click()
+    addImgSwitchBtn()
+    addBgBtn()
 
 $ ->
     $('head').append cardLabelCss
     setInterval (->
         curUrl = window.location.href # 当前页面地址
+        boardId = pageRegex.BoardId.exec curUrl # 当前看板ID
         boardInit()
     ),1000

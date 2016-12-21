@@ -4,7 +4,7 @@
 // ==UserScript==
 // @name              Trello - Thenow Trello Extend
 // @namespace         http://ejiasoft.com/
-// @version           1.1.3
+// @version           1.1.4
 // @description       Extend trello.com
 // @description:zh-CN 扩展trello.com看板的功能
 // @homepageurl       https://github.com/thenow/ThenowTrelloExtend
@@ -18,7 +18,7 @@
  */
 
 (function() {
-  var boardInit, cardLabelCss, curUrl, imgSwitch_click, listCardFormat, listFormatInit, listTitleFormat, pageRegex;
+  var addBgBtn, addImgSwitchBtn, boardId, boardInit, cardLabelCss, curUrl, listCardFormat, listFormatInit, listTitleFormat, pageRegex;
 
   pageRegex = {
     CardLimit: /\[\d+\]/,
@@ -27,8 +27,13 @@
     CardCount: /^\d+/,
     Number: /\d+/,
     CardNum: /^#\d+/,
-    HomePage: /com[\/]$/
+    HomePage: /com[\/]$/,
+    BoardId: /\/b\/.{8}\/-$/
   };
+
+  curUrl = window.location.href;
+
+  boardId = pageRegex.BoardId.exec(curUrl);
 
   cardLabelCss = "<style type=\"text/css\">\n    .list-card-labels .card-label {\n        font-weight: normal;\n        font-size: 10px;\n        height: 12px !important;\n        line-height: 10px !important;\n        padding: 0 3px;\n        margin: 0 3px 0 0;\n        text-shadow: none;\n        width: auto;\n        max-width: 50px;\n    }\n    .card-short-id {\n        display: inline;\n        font-weight: bold;\n    }\n    .card-short-id:after {\n        content:\" \";\n    }\n</style>";
 
@@ -88,7 +93,7 @@
     });
   };
 
-  imgSwitch_click = function() {
+  addImgSwitchBtn = function() {
     var imgSwitch;
     if ($('#btnImgSwitch').length > 0) {
       return;
@@ -100,21 +105,49 @@
     });
   };
 
-  curUrl = window.location.href;
+  addBgBtn = function() {
+    var setBgBtn;
+    if ($('#setBgBtn').length > 0) {
+      return;
+    }
+    setBgBtn = $('<a id="setBgBtn" class="board-header-btn board-header-btn-org-name board-header-btn-without-icon"><span class="board-header-btn-text">设置背景图片</span></a>');
+    $('div.board-header').append(setBgBtn);
+    return setBgBtn.click(function() {
+      var newBgUrl, oldBgUrl;
+      oldBgUrl = localStorage[boardId[0]];
+      newBgUrl = prompt('请输入背景图片地址', oldBgUrl);
+      if (newBgUrl === oldBgUrl) {
+        return;
+      }
+      if (newBgUrl === null || newBgUrl === '') {
+        localStorage.removeItem(boardId[0]);
+        return;
+      }
+      return localStorage[boardId[0]] = newBgUrl;
+    });
+  };
 
   boardInit = function() {
+    var bgUrl, localBgUrl;
     if (pageRegex.HomePage.exec(curUrl) !== null) {
       return;
     }
+    bgUrl = $('body').css('background-image');
+    localBgUrl = localStorage[boardId[0]];
+    if (localBgUrl !== void 0 && bgUrl !== localBgUrl) {
+      $('body').css('background-image', "url(\"" + localBgUrl + "\")");
+    }
     $('p.list-header-num-cards').show();
     listFormatInit();
-    return imgSwitch_click();
+    addImgSwitchBtn();
+    return addBgBtn();
   };
 
   $(function() {
     $('head').append(cardLabelCss);
     return setInterval((function() {
       curUrl = window.location.href;
+      boardId = pageRegex.BoardId.exec(curUrl);
       return boardInit();
     }), 1000);
   });
