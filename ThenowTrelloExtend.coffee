@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name              Trello - Thenow Trello Extend
 // @namespace         http://ejiasoft.com/
-// @version           1.1.4
+// @version           1.1.5
 // @description       Extend trello.com
 // @description:zh-CN 扩展trello.com看板的功能
 // @homepageurl       https://github.com/thenow/ThenowTrelloExtend
@@ -51,23 +51,19 @@ cardLabelCss = """
 </style>"""
 
 listCardFormat = (objCard) -> # 卡片格式化
-    listCardTitle = objCard.find('a.list-card-title').filter ':last'
-    cardTitle = listCardTitle.html() # 获取卡片标题
-    cardUserArray = cardTitle.match pageRegex.User # 匹配相关人员标记
-    cardCategoryArray = cardTitle.match pageRegex.Category # 匹配分类标记
-    if cardUserArray != null
-        userStringArray = []
-        for cardUser in cardUserArray
-            cardTitle = cardTitle.replace cardUser,''
-            userStringArray.push "<code>#{cardUser.substring 1,cardUser.length-1}</code>"
-        cardTitle += userStringArray.join ''
-    if cardCategoryArray != null
-        categoryStringArray = []
-        for cardCate in cardCategoryArray 
-            cardTitle = cardTitle.replace cardCate,''
-            categoryStringArray.push "<code style=\"color:#0f9598\">#{cardCate.substring 1,cardCate.length-1}</code>"
-        cardTitle += categoryStringArray.join('')
-    listCardTitle.html cardTitle
+    listCardTitle = objCard.find('div.list-card-details>a.list-card-title').each ->
+        curCardTitle = $ this
+        cardTitle = curCardTitle.html() # 获取卡片标题HTML内容
+        cardUserArray = cardTitle.match pageRegex.User # 匹配相关人员标记
+        cardCategoryArray = cardTitle.match pageRegex.Category # 匹配分类标记
+        if cardUserArray != null
+            for cardUser in cardUserArray
+                cardTitle = cardTitle.replace cardUser,"<code>#{cardUser.substring 1,cardUser.length-1}</code>"
+                curCardTitle.html cardTitle
+        if cardCategoryArray != null
+            for cardCate in cardCategoryArray 
+                cardTitle = cardTitle.replace cardCate,"<code style=\"color:#0f9598\">#{cardCate.substring 1,cardCate.length-1}</code>"
+                curCardTitle.html cardTitle
 
 listTitleFormat = (objList) -> # 在制品限制功能
     curListHeader = objList.find 'div.list-header' # 当前列表对象

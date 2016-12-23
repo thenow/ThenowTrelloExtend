@@ -2,6 +2,9 @@
 Thenow Trello Extend是一个Tampermonkey脚本，用于增加trello.com看板的功能
 
 # 更新日志
+* v1.1.5
+ * 修复重复添加用户的问题
+ 
 * v1.1.4
  * 增加自定义看板背景图片功能
 

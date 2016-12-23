@@ -4,7 +4,7 @@
 // ==UserScript==
 // @name              Trello - Thenow Trello Extend
 // @namespace         http://ejiasoft.com/
-// @version           1.1.4
+// @version           1.1.5
 // @description       Extend trello.com
 // @description:zh-CN 扩展trello.com看板的功能
 // @homepageurl       https://github.com/thenow/ThenowTrelloExtend
@@ -38,30 +38,30 @@
   cardLabelCss = "<style type=\"text/css\">\n    .list-card-labels .card-label {\n        font-weight: normal;\n        font-size: 10px;\n        height: 12px !important;\n        line-height: 10px !important;\n        padding: 0 3px;\n        margin: 0 3px 0 0;\n        text-shadow: none;\n        width: auto;\n        max-width: 50px;\n    }\n    .card-short-id {\n        display: inline;\n        font-weight: bold;\n    }\n    .card-short-id:after {\n        content:\" \";\n    }\n</style>";
 
   listCardFormat = function(objCard) {
-    var cardCate, cardCategoryArray, cardTitle, cardUser, cardUserArray, categoryStringArray, i, j, len, len1, listCardTitle, userStringArray;
-    listCardTitle = objCard.find('a.list-card-title').filter(':last');
-    cardTitle = listCardTitle.html();
-    cardUserArray = cardTitle.match(pageRegex.User);
-    cardCategoryArray = cardTitle.match(pageRegex.Category);
-    if (cardUserArray !== null) {
-      userStringArray = [];
-      for (i = 0, len = cardUserArray.length; i < len; i++) {
-        cardUser = cardUserArray[i];
-        cardTitle = cardTitle.replace(cardUser, '');
-        userStringArray.push("<code>" + (cardUser.substring(1, cardUser.length - 1)) + "</code>");
+    var listCardTitle;
+    return listCardTitle = objCard.find('div.list-card-details>a.list-card-title').each(function() {
+      var cardCate, cardCategoryArray, cardTitle, cardUser, cardUserArray, curCardTitle, i, j, len, len1, results;
+      curCardTitle = $(this);
+      cardTitle = curCardTitle.html();
+      cardUserArray = cardTitle.match(pageRegex.User);
+      cardCategoryArray = cardTitle.match(pageRegex.Category);
+      if (cardUserArray !== null) {
+        for (i = 0, len = cardUserArray.length; i < len; i++) {
+          cardUser = cardUserArray[i];
+          cardTitle = cardTitle.replace(cardUser, "<code>" + (cardUser.substring(1, cardUser.length - 1)) + "</code>");
+          curCardTitle.html(cardTitle);
+        }
       }
-      cardTitle += userStringArray.join('');
-    }
-    if (cardCategoryArray !== null) {
-      categoryStringArray = [];
-      for (j = 0, len1 = cardCategoryArray.length; j < len1; j++) {
-        cardCate = cardCategoryArray[j];
-        cardTitle = cardTitle.replace(cardCate, '');
-        categoryStringArray.push("<code style=\"color:#0f9598\">" + (cardCate.substring(1, cardCate.length - 1)) + "</code>");
+      if (cardCategoryArray !== null) {
+        results = [];
+        for (j = 0, len1 = cardCategoryArray.length; j < len1; j++) {
+          cardCate = cardCategoryArray[j];
+          cardTitle = cardTitle.replace(cardCate, "<code style=\"color:#0f9598\">" + (cardCate.substring(1, cardCate.length - 1)) + "</code>");
+          results.push(curCardTitle.html(cardTitle));
+        }
+        return results;
       }
-      cardTitle += categoryStringArray.join('');
-    }
-    return listCardTitle.html(cardTitle);
+    });
   };
 
   listTitleFormat = function(objList) {
