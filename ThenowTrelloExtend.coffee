@@ -85,17 +85,21 @@ listFormatInit = ->
         listTitleFormat $(this)
         $(this).find('div.list-card').each ->
             listCardFormat $(this)
-
+            
+btnClass = 'board-header-btn board-header-btn-org-name board-header-btn-without-icon'
+btnTextClass = 'board-header-btn-text'
 addImgSwitchBtn = -> # 添加图片显示开关
-    return if $('#btnImgSwitch').length > 0
-    imgSwitch = $ '<a id="btnImgSwitch" class="board-header-btn board-header-btn-org-name board-header-btn-without-icon"><span class="board-header-btn-text">隐藏/显示图片</span></a>' # 按钮对象
+    btnId = 'btnImgSwitch'
+    return if $("##{btnId}").length > 0
+    imgSwitch = $ "<a id=\"#{btnId}\" class=\"#{btnClass}\"><span class=\"btnTextClass\">隐藏/显示图片</span></a>" # 按钮对象
     $('div.board-header').append imgSwitch # 添加按钮
     imgSwitch.click ->
         $('div.list-card-cover').slideToggle()
 
 addBgBtn = -> # 添加修改背景按钮
-    return if $('#setBgBtn').length > 0
-    setBgBtn = $ '<a id="setBgBtn" class="board-header-btn board-header-btn-org-name board-header-btn-without-icon"><span class="board-header-btn-text">设置背景图片</span></a>' # 按钮对象
+    btnId = 'setBgBtn'
+    return if $("##{btnId}").length > 0
+    setBgBtn = $ "<a id=\"#{btnId}\" class=\"#{btnClass}\"><span class=\"btnTextClass\">设置背景图片</span></a>" # 按钮对象
     $('div.board-header').append setBgBtn # 添加按钮
     setBgBtn.click ->
         oldBgUrl = localStorage[boardId[0]]
@@ -105,6 +109,11 @@ addBgBtn = -> # 添加修改背景按钮
             localStorage.removeItem boardId[0]
             return
         localStorage[boardId[0]] = newBgUrl
+
+addMemberToggleBtn = -> # 添加成员显示开关
+    btnId = 'memberToggleBtn'
+    return if $('##{btnId}').length > 0
+    memberToggleBtn = $ "<a id=\"#{btnId}\" class=\"#{btnClass}\"><span class=\"btnTextClass\">隐藏/显示成员头像</span></a>" # 按钮对象
 
 boardInit = ->
     return if pageRegex.HomePage.exec(curUrl) != null # 首页不执行

@@ -18,7 +18,7 @@
  */
 
 (function() {
-  var addBgBtn, addImgSwitchBtn, boardId, boardInit, cardLabelCss, curUrl, listCardFormat, listFormatInit, listTitleFormat, pageRegex;
+  var addBgBtn, addImgSwitchBtn, addMemberToggleBtn, boardId, boardInit, btnClass, btnTextClass, cardLabelCss, curUrl, listCardFormat, listFormatInit, listTitleFormat, pageRegex;
 
   pageRegex = {
     CardLimit: /\[\d+\]/,
@@ -93,12 +93,17 @@
     });
   };
 
+  btnClass = 'board-header-btn board-header-btn-org-name board-header-btn-without-icon';
+
+  btnTextClass = 'board-header-btn-text';
+
   addImgSwitchBtn = function() {
-    var imgSwitch;
-    if ($('#btnImgSwitch').length > 0) {
+    var btnId, imgSwitch;
+    btnId = 'btnImgSwitch';
+    if ($("#" + btnId).length > 0) {
       return;
     }
-    imgSwitch = $('<a id="btnImgSwitch" class="board-header-btn board-header-btn-org-name board-header-btn-without-icon"><span class="board-header-btn-text">隐藏/显示图片</span></a>');
+    imgSwitch = $("<a id=\"" + btnId + "\" class=\"" + btnClass + "\"><span class=\"btnTextClass\">隐藏/显示图片</span></a>");
     $('div.board-header').append(imgSwitch);
     return imgSwitch.click(function() {
       return $('div.list-card-cover').slideToggle();
@@ -106,11 +111,12 @@
   };
 
   addBgBtn = function() {
-    var setBgBtn;
-    if ($('#setBgBtn').length > 0) {
+    var btnId, setBgBtn;
+    btnId = 'setBgBtn';
+    if ($("#" + btnId).length > 0) {
       return;
     }
-    setBgBtn = $('<a id="setBgBtn" class="board-header-btn board-header-btn-org-name board-header-btn-without-icon"><span class="board-header-btn-text">设置背景图片</span></a>');
+    setBgBtn = $("<a id=\"" + btnId + "\" class=\"" + btnClass + "\"><span class=\"btnTextClass\">设置背景图片</span></a>");
     $('div.board-header').append(setBgBtn);
     return setBgBtn.click(function() {
       var newBgUrl, oldBgUrl;
@@ -125,6 +131,15 @@
       }
       return localStorage[boardId[0]] = newBgUrl;
     });
+  };
+
+  addMemberToggleBtn = function() {
+    var btnId, memberToggleBtn;
+    btnId = 'memberToggleBtn';
+    if ($('##{btnId}').length > 0) {
+      return;
+    }
+    return memberToggleBtn = $("<a id=\"" + btnId + "\" class=\"" + btnClass + "\"><span class=\"btnTextClass\">隐藏/显示成员头像</span></a>");
   };
 
   boardInit = function() {
