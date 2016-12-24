@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name              Trello - Thenow Trello Extend
 // @namespace         http://ejiasoft.com/
-// @version           1.1.5
+// @version           1.1.6
 // @description       Extend trello.com
 // @description:zh-CN 扩展trello.com看板的功能
 // @homepageurl       https://github.com/thenow/ThenowTrelloExtend
@@ -88,20 +88,19 @@ listFormatInit = ->
             
 btnClass = 'board-header-btn board-header-btn-org-name board-header-btn-without-icon'
 btnTextClass = 'board-header-btn-text'
+addBoardBtn = (id, text, eventAction, eventName='click')-> # 添加按钮
+    return $ "##{id}" if $("##{id}").length >0
+    newBtn = $ "<a id=\"#{id}\" class=\"#{btnClass}\"><span class=\"#{btnTextClass}\">#{text}</span></a>" # 按钮对象
+    $('div.board-header').append newBtn # 添加按钮
+    newBtn.bind eventName,eventAction if eventAction != null # 绑定事件
+    return newBtn # 返回按钮对象
+
 addImgSwitchBtn = -> # 添加图片显示开关
-    btnId = 'btnImgSwitch'
-    return if $("##{btnId}").length > 0
-    imgSwitch = $ "<a id=\"#{btnId}\" class=\"#{btnClass}\"><span class=\"btnTextClass\">隐藏/显示图片</span></a>" # 按钮对象
-    $('div.board-header').append imgSwitch # 添加按钮
-    imgSwitch.click ->
+    addBoardBtn 'btnImgSwitch','隐藏/显示图片',->
         $('div.list-card-cover').slideToggle()
 
 addBgBtn = -> # 添加修改背景按钮
-    btnId = 'setBgBtn'
-    return if $("##{btnId}").length > 0
-    setBgBtn = $ "<a id=\"#{btnId}\" class=\"#{btnClass}\"><span class=\"btnTextClass\">设置背景图片</span></a>" # 按钮对象
-    $('div.board-header').append setBgBtn # 添加按钮
-    setBgBtn.click ->
+    addBoardBtn 'setBgBtn','设置背景图片',->
         oldBgUrl = localStorage[boardId[0]]
         newBgUrl = prompt '请输入背景图片地址',oldBgUrl
         return if newBgUrl == oldBgUrl
@@ -111,9 +110,8 @@ addBgBtn = -> # 添加修改背景按钮
         localStorage[boardId[0]] = newBgUrl
 
 addMemberToggleBtn = -> # 添加成员显示开关
-    btnId = 'memberToggleBtn'
-    return if $('##{btnId}').length > 0
-    memberToggleBtn = $ "<a id=\"#{btnId}\" class=\"#{btnClass}\"><span class=\"btnTextClass\">隐藏/显示成员头像</span></a>" # 按钮对象
+    addBoardBtn 'memberSwitchBtn','隐藏/显示成员',->
+        $('div.list-card-members').slideToggle()
 
 boardInit = ->
     return if pageRegex.HomePage.exec(curUrl) != null # 首页不执行
@@ -125,6 +123,7 @@ boardInit = ->
     listFormatInit()
     addImgSwitchBtn()
     addBgBtn()
+    addMemberToggleBtn()
 
 $ ->
     $('head').append cardLabelCss

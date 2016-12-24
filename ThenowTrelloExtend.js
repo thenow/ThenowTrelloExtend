@@ -4,7 +4,7 @@
 // ==UserScript==
 // @name              Trello - Thenow Trello Extend
 // @namespace         http://ejiasoft.com/
-// @version           1.1.5
+// @version           1.1.6
 // @description       Extend trello.com
 // @description:zh-CN 扩展trello.com看板的功能
 // @homepageurl       https://github.com/thenow/ThenowTrelloExtend
@@ -18,7 +18,7 @@
  */
 
 (function() {
-  var addBgBtn, addImgSwitchBtn, addMemberToggleBtn, boardId, boardInit, btnClass, btnTextClass, cardLabelCss, curUrl, listCardFormat, listFormatInit, listTitleFormat, pageRegex;
+  var addBgBtn, addBoardBtn, addImgSwitchBtn, addMemberToggleBtn, boardId, boardInit, btnClass, btnTextClass, cardLabelCss, curUrl, listCardFormat, listFormatInit, listTitleFormat, pageRegex;
 
   pageRegex = {
     CardLimit: /\[\d+\]/,
@@ -97,28 +97,30 @@
 
   btnTextClass = 'board-header-btn-text';
 
-  addImgSwitchBtn = function() {
-    var btnId, imgSwitch;
-    btnId = 'btnImgSwitch';
-    if ($("#" + btnId).length > 0) {
-      return;
+  addBoardBtn = function(id, text, eventAction, eventName) {
+    var newBtn;
+    if (eventName == null) {
+      eventName = 'click';
     }
-    imgSwitch = $("<a id=\"" + btnId + "\" class=\"" + btnClass + "\"><span class=\"btnTextClass\">隐藏/显示图片</span></a>");
-    $('div.board-header').append(imgSwitch);
-    return imgSwitch.click(function() {
+    if ($("#" + id).length > 0) {
+      return $("#" + id);
+    }
+    newBtn = $("<a id=\"" + id + "\" class=\"" + btnClass + "\"><span class=\"" + btnTextClass + "\">" + text + "</span></a>");
+    $('div.board-header').append(newBtn);
+    if (eventAction !== null) {
+      newBtn.bind(eventName, eventAction);
+    }
+    return newBtn;
+  };
+
+  addImgSwitchBtn = function() {
+    return addBoardBtn('btnImgSwitch', '隐藏/显示图片', function() {
       return $('div.list-card-cover').slideToggle();
     });
   };
 
   addBgBtn = function() {
-    var btnId, setBgBtn;
-    btnId = 'setBgBtn';
-    if ($("#" + btnId).length > 0) {
-      return;
-    }
-    setBgBtn = $("<a id=\"" + btnId + "\" class=\"" + btnClass + "\"><span class=\"btnTextClass\">设置背景图片</span></a>");
-    $('div.board-header').append(setBgBtn);
-    return setBgBtn.click(function() {
+    return addBoardBtn('setBgBtn', '设置背景图片', function() {
       var newBgUrl, oldBgUrl;
       oldBgUrl = localStorage[boardId[0]];
       newBgUrl = prompt('请输入背景图片地址', oldBgUrl);
@@ -134,12 +136,9 @@
   };
 
   addMemberToggleBtn = function() {
-    var btnId, memberToggleBtn;
-    btnId = 'memberToggleBtn';
-    if ($('##{btnId}').length > 0) {
-      return;
-    }
-    return memberToggleBtn = $("<a id=\"" + btnId + "\" class=\"" + btnClass + "\"><span class=\"btnTextClass\">隐藏/显示成员头像</span></a>");
+    return addBoardBtn('memberSwitchBtn', '隐藏/显示成员', function() {
+      return $('div.list-card-members').slideToggle();
+    });
   };
 
   boardInit = function() {
@@ -155,7 +154,8 @@
     $('p.list-header-num-cards').show();
     listFormatInit();
     addImgSwitchBtn();
-    return addBgBtn();
+    addBgBtn();
+    return addMemberToggleBtn();
   };
 
   $(function() {

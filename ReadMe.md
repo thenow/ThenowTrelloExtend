@@ -2,8 +2,8 @@
 Thenow Trello Extend是一个Tampermonkey脚本，用于增加trello.com看板的功能
 
 # 更新日志
-* v1.1.5
- * 修复重复添加用户的问题
+* v1.1.6
+ * 增加成员显示开关
  
 * v1.1.4
  * 增加自定义看板背景图片功能
@@ -19,6 +19,7 @@ Thenow Trello Extend是一个Tampermonkey脚本，用于增加trello.com看板�
 5. 高亮显示分类（在卡片标题中增加“{分类名称}”）
 6. 显示标签文字内容
 7. 自定义看板背景图片
+8. 隐藏/显示卡片成员
 
 # 脚本安装路径
 [https://greasyfork.org/zh-CN/scripts/25779-trello-thenow-trello-extend](https://greasyfork.org/zh-CN/scripts/25779-trello-thenow-trello-extend)
