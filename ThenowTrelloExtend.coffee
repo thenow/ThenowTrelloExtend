@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name              Trello - Thenow Trello Extend
 // @namespace         http://ejiasoft.com/
-// @version           1.1.6
+// @version           1.1.6.1
 // @description       Extend trello.com
 // @description:zh-CN 扩展trello.com看板的功能
 // @homepageurl       https://github.com/thenow/ThenowTrelloExtend
@@ -106,6 +106,7 @@ addBgBtn = -> # 添加修改背景按钮
         return if newBgUrl == oldBgUrl
         if newBgUrl == null or newBgUrl == ''
             localStorage.removeItem boardId[0]
+            $('body').css 'background-image',''
             return
         localStorage[boardId[0]] = newBgUrl
 
