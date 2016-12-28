@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name              Trello - Thenow Trello Extend
 // @namespace         http://ejiasoft.com/
-// @version           1.1.6.1
+// @version           1.1.7
 // @description       Extend trello.com
 // @description:zh-CN 扩展trello.com看板的功能
 // @homepageurl       https://github.com/thenow/ThenowTrelloExtend
@@ -30,17 +30,6 @@ boardId = pageRegex.BoardId.exec curUrl # 当前看板ID
 
 cardLabelCss = """
 <style type="text/css">
-    .list-card-labels .card-label {
-        font-weight: normal;
-        font-size: 10px;
-        height: 12px !important;
-        line-height: 10px !important;
-        padding: 0 3px;
-        margin: 0 3px 0 0;
-        text-shadow: none;
-        width: auto;
-        max-width: 50px;
-    }
     .card-short-id {
         display: inline;
         font-weight: bold;
@@ -48,9 +37,34 @@ cardLabelCss = """
     .card-short-id:after {
         content:" ";
     }
+    .column-list{padding:5px 15px 10px;}
+    .column-list li{height:30px;width:100%;display:block;}
+    .column-list li a{display:block;height:100%;line-height:30px;position:relative;}
+    .column-list li a:before{font-family: trellicons;content:"\\e910";display:block;position:absolute;right:5px;top:2px;color:#333;}
+    .column-list li a.false:before{content:"-";color:#DDD;}
+    .card-label.mod-card-front {
+        width: auto;
+        height: 12px;
+        line-height: 12px;
+        font-size: 12px;
+        text-shadow: none;
+        padding: 3px 6px;
+        font-family: Microsoft Yahei;
+        font-weight: 400;
+    }
+    .list-card-title .card-short-id {
+        display: inline;
+        margin-right: 4px;
+        color: #0079bf;
+    }
+    .list .list-header-num-cards {
+        display: block;
+        font-size: 12px;
+        line-height: 18px;
+    }
 </style>"""
 
-listCardFormat = (objCard) -> # 卡片格式化
+listCardFormat = (objCard) -> # 卡片标题格式化
     listCardTitle = objCard.find('div.list-card-details>a.list-card-title').each ->
         curCardTitle = $ this
         cardTitle = curCardTitle.html() # 获取卡片标题HTML内容
@@ -80,9 +94,25 @@ listTitleFormat = (objList) -> # 在制品限制功能
     else
         objList.css 'background','#e2e4e6'
 
+listToggle = (objList) ->
+    return if objList.find('.toggleBtn').length > 0
+    listMenu = objList.find 'div.list-header-extras' # 当前列表对象
+    toggleBtn = $ '<a class="toggleBtn list-header-extras-menu dark-hover"><span class="icon-sm">隐</span></a>'
+    toggleBtn.click ->
+        base = objList.parent()
+        if base.width() == 30
+            base.css 'width',''
+        else 
+            base.width 30
+        objList.find('.js-open-list-menu').toggle()
+        objList.find('div.list-cards').toggle()
+        objList.find('.open-card-composer').toggle()
+    listMenu.append toggleBtn
+
 listFormatInit = ->
     $('div.list').each ->
         listTitleFormat $(this)
+        listToggle $(this)
         $(this).find('div.list-card').each ->
             listCardFormat $(this)
             
