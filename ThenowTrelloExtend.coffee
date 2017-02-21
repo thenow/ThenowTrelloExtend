@@ -64,7 +64,8 @@ cardLabelCss = """
     }
 </style>"""
 
-listCardFormat = (objCard) -> # 卡片标题格式化
+# 卡片标题格式化
+listCardFormat = (objCard) -> 
     listCardTitle = objCard.find('div.list-card-details>a.list-card-title').each ->
         curCardTitle = $ this
         cardTitle = curCardTitle.html() # 获取卡片标题HTML内容
@@ -79,7 +80,8 @@ listCardFormat = (objCard) -> # 卡片标题格式化
                 cardTitle = cardTitle.replace cardCate,"<code style=\"color:#0f9598\">#{cardCate.substring 1,cardCate.length-1}</code>"
                 curCardTitle.html cardTitle
 
-listTitleFormat = (objList) -> # 在制品限制功能
+# 在制品限制功能
+listTitleFormat = (objList) -> 
     curListHeader = objList.find 'div.list-header' # 当前列表对象
     curListTitle  = curListHeader.find('textarea.list-header-name').val() # 当前列表名称
     cardLimitInfo = pageRegex.CardLimit.exec curListTitle
@@ -125,11 +127,13 @@ addBoardBtn = (id, text, eventAction, eventName='click')-> # 添加按钮
     newBtn.bind eventName,eventAction if eventAction != null # 绑定事件
     return newBtn # 返回按钮对象
 
-addImgSwitchBtn = -> # 添加图片显示开关
+# 添加图片显示开关
+addImgSwitchBtn = -> 
     addBoardBtn 'btnImgSwitch','隐藏/显示图片',->
         $('div.list-card-cover').slideToggle()
 
-addBgBtn = -> # 添加修改背景按钮
+# 添加修改背景按钮
+addBgBtn = -> 
     addBoardBtn 'setBgBtn','设置背景图片',->
         oldBgUrl = localStorage[boardId[0]]
         newBgUrl = prompt '请输入背景图片地址',oldBgUrl
@@ -139,8 +143,9 @@ addBgBtn = -> # 添加修改背景按钮
             $('body').css 'background-image',''
             return
         localStorage[boardId[0]] = newBgUrl
-
-addMemberToggleBtn = -> # 添加成员显示开关
+        
+# 添加成员显示开关
+addMemberToggleBtn = -> 
     addBoardBtn 'memberSwitchBtn','隐藏/显示成员',->
         $('div.list-card-members').slideToggle()
 
