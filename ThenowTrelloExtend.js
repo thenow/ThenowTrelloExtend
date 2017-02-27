@@ -4,7 +4,7 @@
 // ==UserScript==
 // @name              Trello - Thenow Trello Extend
 // @namespace         http://ejiasoft.com/
-// @version           1.1.5
+// @version           1.1.7
 // @description       Extend trello.com
 // @description:zh-CN 扩展trello.com看板的功能
 // @homepageurl       https://github.com/thenow/ThenowTrelloExtend
@@ -18,7 +18,7 @@
  */
 
 (function() {
-  var addBgBtn, addImgSwitchBtn, addMemberToggleBtn, boardId, boardInit, btnClass, btnTextClass, cardLabelCss, curUrl, listCardFormat, listFormatInit, listTitleFormat, pageRegex;
+  var addBgBtn, addBoardBtn, addImgSwitchBtn, addMemberToggleBtn, boardId, boardInit, btnClass, btnTextClass, cardLabelCss, curUrl, listCardFormat, listFormatInit, listTitleFormat, listToggle, pageRegex;
 
   pageRegex = {
     CardLimit: /\[\d+\]/,
@@ -35,7 +35,7 @@
 
   boardId = pageRegex.BoardId.exec(curUrl);
 
-  cardLabelCss = "<style type=\"text/css\">\n    .list-card-labels .card-label {\n        font-weight: normal;\n        font-size: 10px;\n        height: 12px !important;\n        line-height: 10px !important;\n        padding: 0 3px;\n        margin: 0 3px 0 0;\n        text-shadow: none;\n        width: auto;\n        max-width: 50px;\n    }\n    .card-short-id {\n        display: inline;\n        font-weight: bold;\n    }\n    .card-short-id:after {\n        content:\" \";\n    }\n</style>";
+  cardLabelCss = "<style type=\"text/css\">\n    .card-short-id {\n        display: inline;\n        font-weight: bold;\n    }\n    .card-short-id:after {\n        content:\" \";\n    }\n    .column-list{padding:5px 15px 10px;}\n    .column-list li{height:30px;width:100%;display:block;}\n    .column-list li a{display:block;height:100%;line-height:30px;position:relative;}\n    .column-list li a:before{font-family: trellicons;content:\"\\e910\";display:block;position:absolute;right:5px;top:2px;color:#333;}\n    .column-list li a.false:before{content:\"-\";color:#DDD;}\n    .card-label.mod-card-front {\n        width: auto;\n        height: 12px;\n        line-height: 12px;\n        font-size: 12px;\n        text-shadow: none;\n        padding: 3px 6px;\n        font-family: Microsoft Yahei;\n        font-weight: 400;\n    }\n    .list-card-title .card-short-id {\n        display: inline;\n        margin-right: 4px;\n        color: #0079bf;\n    }\n    .list .list-header-num-cards {\n        display: block;\n        font-size: 12px;\n        line-height: 18px;\n    }\n</style>";
 
   listCardFormat = function(objCard) {
     var listCardTitle;
@@ -84,9 +84,32 @@
     }
   };
 
+  listToggle = function(objList) {
+    var listMenu, toggleBtn;
+    if (objList.find('.toggleBtn').length > 0) {
+      return;
+    }
+    listMenu = objList.find('div.list-header-extras');
+    toggleBtn = $('<a class="toggleBtn list-header-extras-menu dark-hover"><span class="icon-sm">隐</span></a>');
+    toggleBtn.click(function() {
+      var base;
+      base = objList.parent();
+      if (base.width() === 30) {
+        base.css('width', '');
+      } else {
+        base.width(30);
+      }
+      objList.find('.js-open-list-menu').toggle();
+      objList.find('div.list-cards').toggle();
+      return objList.find('.open-card-composer').toggle();
+    });
+    return listMenu.append(toggleBtn);
+  };
+
   listFormatInit = function() {
     return $('div.list').each(function() {
       listTitleFormat($(this));
+      listToggle($(this));
       return $(this).find('div.list-card').each(function() {
         return listCardFormat($(this));
       });
@@ -97,28 +120,30 @@
 
   btnTextClass = 'board-header-btn-text';
 
-  addImgSwitchBtn = function() {
-    var btnId, imgSwitch;
-    btnId = 'btnImgSwitch';
-    if ($("#" + btnId).length > 0) {
-      return;
+  addBoardBtn = function(id, text, eventAction, eventName) {
+    var newBtn;
+    if (eventName == null) {
+      eventName = 'click';
     }
-    imgSwitch = $("<a id=\"" + btnId + "\" class=\"" + btnClass + "\"><span class=\"btnTextClass\">隐藏/显示图片</span></a>");
-    $('div.board-header').append(imgSwitch);
-    return imgSwitch.click(function() {
+    if ($("#" + id).length > 0) {
+      return $("#" + id);
+    }
+    newBtn = $("<a id=\"" + id + "\" class=\"" + btnClass + "\"><span class=\"" + btnTextClass + "\">" + text + "</span></a>");
+    $('div.board-header').append(newBtn);
+    if (eventAction !== null) {
+      newBtn.bind(eventName, eventAction);
+    }
+    return newBtn;
+  };
+
+  addImgSwitchBtn = function() {
+    return addBoardBtn('btnImgSwitch', '隐藏/显示图片', function() {
       return $('div.list-card-cover').slideToggle();
     });
   };
 
   addBgBtn = function() {
-    var btnId, setBgBtn;
-    btnId = 'setBgBtn';
-    if ($("#" + btnId).length > 0) {
-      return;
-    }
-    setBgBtn = $("<a id=\"" + btnId + "\" class=\"" + btnClass + "\"><span class=\"btnTextClass\">设置背景图片</span></a>");
-    $('div.board-header').append(setBgBtn);
-    return setBgBtn.click(function() {
+    return addBoardBtn('setBgBtn', '设置背景图片', function() {
       var newBgUrl, oldBgUrl;
       oldBgUrl = localStorage[boardId[0]];
       newBgUrl = prompt('请输入背景图片地址', oldBgUrl);
@@ -127,6 +152,7 @@
       }
       if (newBgUrl === null || newBgUrl === '') {
         localStorage.removeItem(boardId[0]);
+        $('body').css('background-image', '');
         return;
       }
       return localStorage[boardId[0]] = newBgUrl;
@@ -134,12 +160,9 @@
   };
 
   addMemberToggleBtn = function() {
-    var btnId, memberToggleBtn;
-    btnId = 'memberToggleBtn';
-    if ($('##{btnId}').length > 0) {
-      return;
-    }
-    return memberToggleBtn = $("<a id=\"" + btnId + "\" class=\"" + btnClass + "\"><span class=\"btnTextClass\">隐藏/显示成员头像</span></a>");
+    return addBoardBtn('memberSwitchBtn', '隐藏/显示成员', function() {
+      return $('div.list-card-members').slideToggle();
+    });
   };
 
   boardInit = function() {
@@ -155,7 +178,8 @@
     $('p.list-header-num-cards').show();
     listFormatInit();
     addImgSwitchBtn();
-    return addBgBtn();
+    addBgBtn();
+    return addMemberToggleBtn();
   };
 
   $(function() {
