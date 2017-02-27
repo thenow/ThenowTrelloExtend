@@ -114,6 +114,9 @@ addMemberToggleBtn = -> # 添加成员显示开关
     btnId = 'memberToggleBtn'
     return if $('##{btnId}').length > 0
     memberToggleBtn = $ "<a id=\"#{btnId}\" class=\"#{btnClass}\"><span class=\"btnTextClass\">隐藏/显示成员头像</span></a>" # 按钮对象
+    $('div.board-header').append memberToggleBtn # 添加按钮
+    memberToggleBtn.click ->
+        $('')
 
 boardInit = ->
     return if pageRegex.HomePage.exec(curUrl) != null # 首页不执行
